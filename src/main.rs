@@ -8,9 +8,12 @@ struct Project {
     description: String,
 } 
 
-
 fn help() {
-    println!("Help:\n help: Show this help menu \n exit: exit the program \n new: create a new project \n delete: delete a project \n list: list all projects in the db");
+    println!("Help:\n help: Show this help menu \n exit: Exit the program \n new: Create a new project \n delete: Delete a project \n list: List all projects in the Database \n version: Print version number \n");
+}
+
+fn version() {
+    println!("Version: {}", env!("CARGO_PKG_VERSION"));
 }
 
 fn add_project() -> Project {
@@ -75,7 +78,10 @@ fn main() {
             println!("Your Project was added succesfully!")
         } else if input == "list" {
             list_projects(&projects);
-        } else {
+        } else if input == "version" {
+            version();
+        } 
+        else {
             println!("Unknown Command!");
         }
     }
