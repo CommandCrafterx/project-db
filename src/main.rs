@@ -16,13 +16,30 @@ fn version() {
     println!("Version: {}", env!("CARGO_PKG_VERSION"));
 }
 
-fn add_project() -> Project {
+fn add_project(projects: &Vec<Project>) -> Project {
+    
     // Ask user for project Information
-    let id: u32 = Input::new()
-    .with_prompt("Enter a Project ID")
-    .interact_text()
-    .unwrap();
+    let id: u32 = loop {
+        
+        let new_id: u32 = Input::new()
+        .with_prompt("Enter a Project ID")
+        .interact_text()
+        .unwrap();
+        
+        let mut id_already_in_use = false;
 
+        for project in projects {
+            if new_id == project.id {
+                id_already_in_use = true;
+            }
+        }
+        if id_already_in_use {
+            println!("The ID is already in use! Please try again");
+        } else {
+            break new_id;
+        }
+    };
+    
     let name: String = Input::new()
         .with_prompt("Enter a name for the project")
         .interact_text()
@@ -73,7 +90,7 @@ fn main() {
         } else if input == "exit" {
             break;
         } else if input == "new" {
-            let project = add_project();
+            let project = add_project(&projects);
             projects.push(project);
             println!("Your Project was added succesfully!")
         } else if input == "list" {
