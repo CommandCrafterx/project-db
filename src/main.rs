@@ -19,15 +19,16 @@ fn version() {
 fn add_project(projects: &Vec<Project>) -> Project {
     
     // Ask user for project Information
+    
     let id: u32 = loop {
         
+        // Ask user for project ID and check if it is already in use
         let new_id: u32 = Input::new()
         .with_prompt("Enter a Project ID")
         .interact_text()
         .unwrap();
         
         let mut id_already_in_use = false;
-
         for project in projects {
             if new_id == project.id {
                 id_already_in_use = true;
@@ -36,10 +37,11 @@ fn add_project(projects: &Vec<Project>) -> Project {
         if id_already_in_use {
             println!("The ID is already in use! Please try again");
         } else {
+            // End the loop and return the final ID
             break new_id;
         }
     };
-    
+    // Ask user for project name and description
     let name: String = Input::new()
         .with_prompt("Enter a name for the project")
         .interact_text()
