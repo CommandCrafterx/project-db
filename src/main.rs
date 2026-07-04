@@ -63,6 +63,35 @@ fn add_project(projects: &Vec<Project>) -> Project {
     
 }
 
+fn delete_project(projects: &mut Vec<Project>) {
+    // Ask user for project ID to delete and ckeck if it exists
+    let delete_id: u32 = Input::new()
+    .with_prompt("Enter the ID of the Project to delete")
+    .interact_text()
+    .unwrap();
+
+    let mut found: bool = false;
+    let mut delete_index: usize = 0;
+
+    for project in projects.iter() {
+        if delete_id == project.id {
+            found = true;
+            break;
+        }
+        delete_index +=1;
+    }
+
+    if found {
+        println!("Deleting Project {delete_id} at index {delete_index}...");
+        projects.remove(delete_index);
+    } else {
+        println!("The Project you are requesting to delete doesent exist.");
+    }
+    
+
+    
+}
+
 fn list_projects(projects: &Vec<Project>) {
     // List all projects from the vector
     println!("All Projects:\n");
@@ -99,8 +128,9 @@ fn main() {
             list_projects(&projects);
         } else if input == "version" {
             version();
-        } 
-        else {
+        } else if input == "delete" {
+            delete_project(&mut projects);
+        } else {
             println!("Unknown Command!");
         }
     }
