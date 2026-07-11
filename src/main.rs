@@ -1,15 +1,31 @@
 // Import dialoguer Library
 use dialoguer::Input;
+use serde::{Serialize, Deserialize};
+use std::fs::File;
+use std::io::Write;
+use std::path::Path;
+use std::io::Read;
 
 // Define Project Struct
+#[derive(Serialize, Deserialize)]
 struct Project {
     id: u32,
     name: String,
     description: String,
 } 
 
+// Define JSON file for the data
+const DB_FILE: &str = "data.json";
+
 fn help() {
-    println!("Help:\n help: Show this help menu \n exit: Exit the program \n new: Create a new project \n delete: Delete a project \n list: List all projects in the Database \n version: Print version number \n");
+    println!("Help: 
+     help: Show this help menu 
+     exit: Exit the program 
+     new: Create a new project 
+     delete: Delete a project 
+     list: List all projects in the Database 
+     save: Manually save the database to a file 
+     version: Print version number \n");
 }
 
 fn version() {
@@ -102,9 +118,49 @@ fn list_projects(projects: &Vec<Project>) {
     }
 }
 
+fn save_to_file(projects: &Vec<Project>) {
+    // Convert the project vector to JSON
+    let db_json = serde_json::to_string_pretty(projects).unwrap();
+
+    // Create data.json
+    let mut file = File::create(DB_FILE).unwrap();
+
+    // Write the JSON data to the data.json file
+    file.write_all(db_json.as_bytes()).unwrap();
+    println!("Succesfully saved Database to file")
+}
+
+fn load_from_file() -> Vec<Project> {
+    // Open the database file and save it to a variable
+    let mut file = File::open(DB_FILE).unwrap();
+    
+    // Create an empty String for the data
+    let mut db_json = String::new();
+
+    // Read the JSON file to db_json
+    file.read_to_string(&mut db_json).unwrap();
+    
+    // Create the Database from db_json and return the new database
+    let projects: Vec<Project> = serde_json::from_str(&db_json).unwrap();
+    return projects;
+}
+
+fn check_for_db_file() -> bool {
+    let db_file_exists: bool = Path::new(DB_FILE).exists();
+    return db_file_exists;
+}
+
 fn main() {
-    // Initialize Database
-    let mut projects: Vec<Project> = Vec::new();
+    // Initialize or load Database
+    let mut projects: Vec<Project>;
+    if check_for_db_file() {
+        println!("Loading database from existing file...\n");
+        projects = load_from_file();
+    } else {
+        println!("No existing Database found creating a new one...\n");
+        projects = Vec::new();
+    }
+
     // Welcome text
     println!("Welcome to ProjectDB!\n");
     help();
@@ -130,6 +186,8 @@ fn main() {
             version();
         } else if input == "delete" {
             delete_project(&mut projects);
+        } else if input == "save" {
+            save_to_file(&projects);
         } else {
             println!("Unknown Command!");
         }
