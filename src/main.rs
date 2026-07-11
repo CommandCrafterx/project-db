@@ -1,4 +1,3 @@
-// Import dialoguer Library
 use dialoguer::Input;
 use serde::{Serialize, Deserialize};
 use std::fs::File;
