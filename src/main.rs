@@ -110,10 +110,14 @@ fn delete_project(projects: &mut Vec<Project>) {
 fn list_projects(projects: &Vec<Project>) {
     // List all projects from the vector
     println!("All Projects:\n");
-    for project in projects {
-        println!("ID: {}", project.id);
-        println!("Name: {}", project.name);
-        println!("Description: {} \n", project.description);
+    if projects.is_empty() {
+        println!("There are currently no projects stored.\n");
+    } else {
+        for project in projects {
+            println!("ID: {}", project.id);
+            println!("Name: {}", project.name);
+            println!("Description: {} \n", project.description);
+        }
     }
 }
 
