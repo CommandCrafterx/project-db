@@ -114,9 +114,8 @@ fn list_projects(projects: &Vec<Project>) {
             println!("ID: {}", project.id);
             println!("Name: {}", project.name);
             println!("Description: {} \n", project.description);
-        
-        println!("Projects stored: {} \n", projects.len());
         }
+        println!("Projects stored: {} \n", projects.len());
     }
 }
 
