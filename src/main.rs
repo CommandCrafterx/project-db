@@ -1,9 +1,6 @@
 use dialoguer::Input;
 use serde::{Serialize, Deserialize};
-use std::fs::File;
-use std::io::Write;
 use std::path::Path;
-use std::io::Read;
 
 // Define Project Struct
 #[derive(Serialize, Deserialize)]
@@ -117,6 +114,7 @@ fn list_projects(projects: &Vec<Project>) {
             println!("ID: {}", project.id);
             println!("Name: {}", project.name);
             println!("Description: {} \n", project.description);
+        
         println!("Projects stored: {} \n", projects.len());
         }
     }
@@ -126,23 +124,14 @@ fn save_to_file(projects: &Vec<Project>) {
     // Convert the project vector to JSON
     let db_json = serde_json::to_string_pretty(projects).unwrap();
 
-    // Create data.json
-    let mut file = File::create(DB_FILE).unwrap();
-
     // Write the JSON data to the data.json file
-    file.write_all(db_json.as_bytes()).unwrap();
+    std::fs::write(DB_FILE, db_json).unwrap();
     println!("Succesfully saved Database to file")
 }
 
 fn load_from_file() -> Vec<Project> {
-    // Open the database file and save it to a variable
-    let mut file = File::open(DB_FILE).unwrap();
     
-    // Create an empty String for the data
-    let mut db_json = String::new();
-
-    // Read the JSON file to db_json
-    file.read_to_string(&mut db_json).unwrap();
+    let db_json = std::fs::read_to_string(DB_FILE).unwrap();
     
     // Create the Database from db_json and return the new database
     let projects: Vec<Project> = serde_json::from_str(&db_json).unwrap();
