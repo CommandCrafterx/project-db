@@ -53,10 +53,15 @@ fn add_project(projects: &Vec<Project>) -> Project {
         }
     };
     // Ask user for a project description
-    let description: String = Input::new()
-        .with_prompt("Enter a project description")
+    let mut description: String = Input::new()
+        .with_prompt("Enter a project description (Optional)")
+        .allow_empty(true)
         .interact_text()
         .unwrap();
+
+    if description == "" {
+        description = String::from("None");
+    }
 
     // Create a Project using the data
      let project = Project {
@@ -107,9 +112,15 @@ fn list_projects(projects: &Vec<Project>) {
     } else {
         for project in projects {
             println!("Name: {}", project.name);
-            println!("Description: {} \n", project.description);
+            
+            if project.description != "None" {
+                println!("Description: {} \n", project.description);
+            } else {
+                println!(""); // Prevent inconsistent formatting when the description isnt printed
+            }
+            
         }
-        println!("Projects stored: {} \n", projects.len());
+        println!("Total projects stored: {}\n", projects.len());
     }
 }
 
