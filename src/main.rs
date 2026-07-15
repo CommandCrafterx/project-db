@@ -5,7 +5,6 @@ use std::path::Path;
 // Define Project Struct
 #[derive(Serialize, Deserialize)]
 struct Project {
-    id: u32,
     name: String,
     description: String,
 } 
@@ -30,35 +29,30 @@ fn version() {
 
 fn add_project(projects: &Vec<Project>) -> Project {
     
-    // Ask user for project Information
     
-    let id: u32 = loop {
-        
-        // Ask user for project ID and check if it is already in use
-        let new_id: u32 = Input::new()
-        .with_prompt("Enter a Project ID")
-        .interact_text()
-        .unwrap();
-        
-        let mut id_already_in_use = false;
-        for project in projects {
-            if new_id == project.id {
-                id_already_in_use = true;
-            }
-        }
-        if id_already_in_use {
-            println!("The ID is already in use! Please try again");
-        } else {
-            // End the loop and return the final ID
-            break new_id;
-        }
-    };
-    // Ask user for project name and description
-    let name: String = Input::new()
+    let name = loop {
+        // Ask user for a project name and check if its already in use
+        let new_name: String = Input::new()
         .with_prompt("Enter a name for the project")
         .interact_text()
         .unwrap();
+        
+        let new_name = new_name.trim().to_string().to_lowercase();
 
+        let mut name_already_in_use: bool = false;
+        for project in projects {
+            if new_name == project.name {
+                name_already_in_use = true;
+            }
+        }
+        if name_already_in_use {
+            println!("The Name is already in use! Please try again");
+        } else {
+            // End the loop and return the name for the project
+            break new_name;
+        }
+    };
+    // Ask user for a project description
     let description: String = Input::new()
         .with_prompt("Enter a project description")
         .interact_text()
@@ -66,7 +60,6 @@ fn add_project(projects: &Vec<Project>) -> Project {
 
     // Create a Project using the data
      let project = Project {
-        id,
         name,
         description,
     };
@@ -76,17 +69,19 @@ fn add_project(projects: &Vec<Project>) -> Project {
 }
 
 fn delete_project(projects: &mut Vec<Project>) {
-    // Ask user for project ID to delete and ckeck if it exists
-    let delete_id: u32 = Input::new()
-    .with_prompt("Enter the ID of the Project to delete")
+    // Ask user for the Project to delete and ckeck if it exists
+    let delete_name: String = Input::new()
+    .with_prompt("Enter the Name of the Project to delete")
     .interact_text()
     .unwrap();
+
+    let delete_name = delete_name.trim().to_lowercase();
 
     let mut found: bool = false;
     let mut delete_index: usize = 0;
 
     for project in projects.iter() {
-        if delete_id == project.id {
+        if delete_name == project.name {
             found = true;
             break;
         }
@@ -94,7 +89,7 @@ fn delete_project(projects: &mut Vec<Project>) {
     }
 
     if found {
-        println!("Deleting Project {delete_id} at index {delete_index}...");
+        println!("Deleting Project {delete_name} at index {delete_index}...");
         projects.remove(delete_index);
     } else {
         println!("The Project you are requesting to delete doesent exist.");
@@ -111,7 +106,6 @@ fn list_projects(projects: &Vec<Project>) {
         println!("There are currently no projects stored.\n");
     } else {
         for project in projects {
-            println!("ID: {}", project.id);
             println!("Name: {}", project.name);
             println!("Description: {} \n", project.description);
         }
