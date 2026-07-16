@@ -74,7 +74,7 @@ fn add_project(projects: &Vec<Project>) -> Project {
 }
 
 fn delete_project(projects: &mut Vec<Project>) {
-    // Ask user for the Project to delete and ckeck if it exists
+    // Ask user for the Project to delete
     let delete_name: String = Input::new()
     .with_prompt("Enter the Name of the Project to delete")
     .interact_text()
@@ -85,6 +85,7 @@ fn delete_project(projects: &mut Vec<Project>) {
     let mut found: bool = false;
     let mut delete_index: usize = 0;
 
+    // Check if the project exists and find out its index in the vector
     for project in projects.iter() {
         if delete_name == project.name {
             found = true;
@@ -94,6 +95,7 @@ fn delete_project(projects: &mut Vec<Project>) {
     }
 
     if found {
+        // Remove the project via its index
         println!("Deleting Project {delete_name} at index {delete_index}...");
         projects.remove(delete_index);
     } else {
@@ -108,7 +110,7 @@ fn list_projects(projects: &Vec<Project>) {
     // List all projects from the vector
     println!("All Projects:\n");
     if projects.is_empty() {
-        println!("There are currently no projects stored.\n");
+        println!("There are currently no projects stored.\n"); // Display a custom message when there are no projects in the vector
     } else {
         for project in projects {
             println!("Name: {}", project.name);
@@ -143,6 +145,7 @@ fn load_from_file() -> Vec<Project> {
 }
 
 fn check_for_db_file() -> bool {
+    // Check if the data.json file exists using Path::new
     let db_file_exists: bool = Path::new(DB_FILE).exists();
     return db_file_exists;
 }
