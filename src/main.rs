@@ -9,8 +9,6 @@ struct Project {
     description: String,
 } 
 
-// Define JSON file for the data
-const DB_FILE: &str = "data.json";
 
 fn help() {
     println!("Help: 
@@ -126,18 +124,35 @@ fn list_projects(projects: &Vec<Project>) {
     }
 }
 
+// Get the paths to the data files of ProjectDB relative to the users home directory
+fn get_data_dir() -> String {
+    let home = std::env::var("HOME").unwrap();
+    let db_dir = format!("{home}/.project-db");
+    return db_dir; 
+}
+fn get_db_path() -> String {
+    let home = std::env::var("HOME").unwrap();
+    let db_path = format!("{home}/.project-db/data.json");
+    return db_path; 
+}
+
 fn save_to_file(projects: &Vec<Project>) {
     // Convert the project vector to JSON
     let db_json = serde_json::to_string_pretty(projects).unwrap();
 
+    // Create the data directory if it doesent exist
+    let db_dir_exists: bool = Path::new(&get_data_dir()).exists();
+    if !db_dir_exists {
+        std::fs::create_dir_all(get_data_dir()).unwrap();
+    }
     // Write the JSON data to the data.json file
-    std::fs::write(DB_FILE, db_json).unwrap();
+    std::fs::write(get_db_path(), db_json).unwrap();
     println!("Succesfully saved Database to file")
 }
 
 fn load_from_file() -> Vec<Project> {
     
-    let db_json = std::fs::read_to_string(DB_FILE).unwrap();
+    let db_json = std::fs::read_to_string(get_db_path()).unwrap();
     
     // Create the Database from db_json and return the new database
     let projects: Vec<Project> = serde_json::from_str(&db_json).unwrap();
@@ -146,7 +161,7 @@ fn load_from_file() -> Vec<Project> {
 
 fn check_for_db_file() -> bool {
     // Check if the data.json file exists using Path::new
-    let db_file_exists: bool = Path::new(DB_FILE).exists();
+    let db_file_exists: bool = Path::new(&get_db_path()).exists();
     return db_file_exists;
 }
 
