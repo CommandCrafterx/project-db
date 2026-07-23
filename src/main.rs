@@ -4,6 +4,7 @@ use std::path::Path;
 use clap::Parser;
 use clap::Subcommand;
 
+// Define the commands for project-db
 #[derive(Subcommand)]
 enum Commands {
     /// Create a new Project
@@ -126,7 +127,7 @@ fn list_projects(projects: &Vec<Project>) {
     }
 }
 
-// Get the paths to the data files of ProjectDB relative to the users home directory
+// Get the paths to the data files of project-db relative to the users home directory
 fn get_data_dir() -> String {
     let home = std::env::var("HOME").unwrap();
     let db_dir = format!("{home}/.local/share/project-db");
@@ -175,9 +176,8 @@ fn main() {
         projects = Vec::new();
     }
 
-    // CLI
+    // Main CLI
     let args = Args::parse();
-
     match args.command {
         Commands::New => {
             let project = add_project(&projects);
