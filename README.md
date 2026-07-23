@@ -14,9 +14,19 @@ A simple CLI project database manager written in Rust, that lets you manage your
 - Interactive prompt-based interface
 
 ## Usage
-
+### Installation:
 ```bash
-cargo run
+cargo install --path .
+```
+### Usage
+```bash
+Usage: project-db <COMMAND>
+
+Commands:
+  new     Create a new Project
+  delete  Delete a Project
+  list    List all Projects
+  help    Print this message or the help of the given subcommand(s)
 ```
 
 ## Data Storage
