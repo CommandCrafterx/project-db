@@ -1,6 +1,22 @@
 use dialoguer::Input;
 use serde::{Serialize, Deserialize};
 use std::path::Path;
+use clap::Parser;
+use clap::Subcommand;
+
+#[derive(Subcommand)]
+enum Commands {
+    New,
+    Delete,
+    List,
+}
+
+#[derive(Parser)]
+#[command(version, about)]
+struct Args {
+    #[command(subcommand)]
+    command: Commands,
+}
 
 // Define Project Struct
 #[derive(Serialize, Deserialize)]
@@ -9,24 +25,7 @@ struct Project {
     description: String,
 } 
 
-
-fn help() {
-    println!("Help: 
-     help: Show this help menu 
-     exit: Exit the program 
-     new: Create a new project 
-     delete: Delete a project 
-     list: List all projects in the Database 
-     save: Manually save the database to a file 
-     version: Print version number \n");
-}
-
-fn version() {
-    println!("Version: {}", env!("CARGO_PKG_VERSION"));
-}
-
 fn add_project(projects: &Vec<Project>) -> Project {
-    
     
     let name = loop {
         // Ask user for a project name and check if its already in use
@@ -127,12 +126,11 @@ fn list_projects(projects: &Vec<Project>) {
 // Get the paths to the data files of ProjectDB relative to the users home directory
 fn get_data_dir() -> String {
     let home = std::env::var("HOME").unwrap();
-    let db_dir = format!("{home}/.project-db");
+    let db_dir = format!("{home}/.local/share/project-db");
     return db_dir; 
 }
 fn get_db_path() -> String {
-    let home = std::env::var("HOME").unwrap();
-    let db_path = format!("{home}/.project-db/data.json");
+    let db_path = format!("{}/data.json", get_data_dir());
     return db_path; 
 }
 
@@ -169,42 +167,27 @@ fn main() {
     // Initialize or load Database
     let mut projects: Vec<Project>;
     if check_for_db_file() {
-        println!("Loading database from existing file...\n");
         projects = load_from_file();
     } else {
-        println!("No existing Database found creating a new one...\n");
         projects = Vec::new();
     }
 
-    // Welcome text
-    println!("Welcome to ProjectDB!\n");
-    help();
+    // CLI
+    let args = Args::parse();
 
-    // Main CLI
-    loop {
-        let input: String = Input::new()
-        .with_prompt("Enter a command")
-        .interact_text()
-        .unwrap();
-
-        if input == "help" {
-            help();
-        } else if input == "exit" {
-            break;
-        } else if input == "new" {
+    match args.command {
+        Commands::New => {
             let project = add_project(&projects);
             projects.push(project);
-            println!("Your Project was added succesfully!")
-        } else if input == "list" {
-            list_projects(&projects);
-        } else if input == "version" {
-            version();
-        } else if input == "delete" {
-            delete_project(&mut projects);
-        } else if input == "save" {
+            println!("Your Project was added succesfully");
             save_to_file(&projects);
-        } else {
-            println!("Unknown Command!");
+        }
+        Commands::Delete => {
+            delete_project(&mut projects);
+            save_to_file(&projects);
+        }
+        Commands::List => {
+            list_projects(&projects);
         }
     }
-}
+    }
