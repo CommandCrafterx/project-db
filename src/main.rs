@@ -6,8 +6,11 @@ use clap::Subcommand;
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Create a new Project
     New,
+    /// Delete a Project
     Delete,
+    /// List all Projects
     List,
 }
 
