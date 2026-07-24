@@ -14,19 +14,36 @@ A simple CLI project database manager written in Rust, that lets you manage your
 - Interactive prompt-based interface
 
 ## Usage
-
+### Installation:
+One line installation:
 ```bash
-cargo run
+cargo install --git https://github.com/CommandCrafterx/project-db
+```
+From the project-db source code:
+```bash
+cargo install --path .
+```
+
+### Usage
+```bash
+Usage: project-db <COMMAND>
+
+Commands:
+  new     Create a new Project
+  delete  Delete a Project
+  list    List all Projects
+  help    Print this message or the help of the given subcommand(s)
 ```
 
 ## Data Storage
 
-The Program currently stores the data in a data.json file in the project folder.
+The Program stores its data in a dedicated folder in "~/.local/share".
 
 ## Dependencies
 
 - [serde](https://serde.rs/) / [serde_json](https://github.com/serde-rs/json): JSON conversion
 - [dialoguer](https://github.com/console-rs/dialoguer): Interactive CLI prompts
+- [clap](https://docs.rs/clap/latest/clap/): CLI argument parsing
 
 ## License
 
