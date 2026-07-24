@@ -193,4 +193,4 @@ fn main() {
             list_projects(&projects);
         }
     }
-    }
+}
