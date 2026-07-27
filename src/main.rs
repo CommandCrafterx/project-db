@@ -10,7 +10,10 @@ enum Commands {
     /// Create a new Project
     New,
     /// Delete a Project
-    Delete,
+    Delete {
+        /// Name of the Project to delete
+        delete_name: String,
+    },
     /// List all Projects
     List,
 }
@@ -74,12 +77,7 @@ fn add_project(projects: &Vec<Project>) -> Project {
     
 }
 
-fn delete_project(projects: &mut Vec<Project>) {
-    // Ask user for the Project to delete
-    let delete_name: String = Input::new()
-    .with_prompt("Enter the Name of the Project to delete")
-    .interact_text()
-    .unwrap();
+fn delete_project(projects: &mut Vec<Project>, delete_name: String) {
 
     let delete_name = delete_name.trim().to_lowercase();
 
@@ -185,8 +183,8 @@ fn main() {
             println!("Your Project was added succesfully");
             save_to_file(&projects);
         }
-        Commands::Delete => {
-            delete_project(&mut projects);
+        Commands::Delete { delete_name } => {
+            delete_project(&mut projects, delete_name);
             save_to_file(&projects);
         }
         Commands::List => {
