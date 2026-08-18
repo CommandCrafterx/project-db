@@ -12,7 +12,14 @@ enum Commands {
     /// Delete a Project
     Delete {
         /// Name of the Project to delete
-        delete_name: String,
+        project: String,
+    },
+    /// Update the state of a project
+    SetStatus {
+        /// Project to change the status of
+        project: String,
+        /// New status
+        new_status: String,
     },
     /// List all Projects
     List,
@@ -30,6 +37,7 @@ struct Args {
 struct Project {
     name: String,
     description: String,
+    status: String,
 } 
 
 fn add_project(projects: &Vec<Project>) -> Project {
@@ -67,41 +75,54 @@ fn add_project(projects: &Vec<Project>) -> Project {
         description = String::from("None");
     }
 
+    // Ask user for a project description
+    let mut status: String = Input::new()
+        .with_prompt("Enter the projects current status (Optional)")
+        .allow_empty(true)
+        .interact_text()
+        .unwrap();
+    
+    if status == "" {
+        status = String::from("None");
+    }
     // Create a Project using the data
      let project = Project {
         name,
         description,
+        status,
     };
     // Return the project
     return project;
     
 }
-
-fn delete_project(projects: &mut Vec<Project>, delete_name: String) {
-
-    let delete_name = delete_name.trim().to_lowercase();
+fn search_project(projects: &Vec<Project>, project: &str) -> (bool, usize) {
+    let project_name = project.trim().to_lowercase();
 
     let mut found: bool = false;
-    let mut delete_index: usize = 0;
+    let mut index: usize = 0;
 
     // Check if the project exists and find out its index in the vector
     for project in projects.iter() {
-        if delete_name == project.name {
+        if project_name == project.name {
             found = true;
             break;
         }
-        delete_index +=1;
+        index +=1;
     }
+     return (found, index);
+}
 
+fn delete_project(projects: &mut Vec<Project>, project: String) {
+    
+    let (found, index) = search_project(&projects, &project);
+    
     if found {
         // Remove the project via its index
-        println!("Deleting Project {delete_name} at index {delete_index}...");
-        projects.remove(delete_index);
+        println!("Deleting Project {project}...");
+        projects.remove(index);
     } else {
         println!("The Project you are requesting to delete doesent exist.");
     }
-    
-
     
 }
 
@@ -115,10 +136,9 @@ fn list_projects(projects: &Vec<Project>) {
             println!("Name: {}", project.name);
             
             if project.description != "None" {
-                println!("Description: {} \n", project.description);
-            } else {
-                println!(""); // Prevent inconsistent formatting when the description isnt printed
+                println!("Description: {}", project.description);
             }
+            println!("Project Status: {}\n", project.status);
             
         }
         println!("Total projects stored: {}\n", projects.len());
@@ -146,13 +166,12 @@ fn save_to_file(projects: &Vec<Project>) {
         std::fs::create_dir_all(get_data_dir()).unwrap();
     }
     // Write the JSON data to the data.json file
-    std::fs::write(get_db_path(), db_json).unwrap();
-    println!("Succesfully saved Database to file")
+    std::fs::write(get_db_path(), db_json).expect("Failed to write Data to file");
 }
 
 fn load_from_file() -> Vec<Project> {
-    
-    let db_json = std::fs::read_to_string(get_db_path()).unwrap();
+    // Read data.json into a string
+    let db_json = std::fs::read_to_string(get_db_path()).expect("Failed to load Data from File");
     
     // Create the Database from db_json and return the new database
     let projects: Vec<Project> = serde_json::from_str(&db_json).unwrap();
@@ -163,6 +182,19 @@ fn check_for_db_file() -> bool {
     // Check if the data.json file exists using Path::new
     let db_file_exists: bool = Path::new(&get_db_path()).exists();
     return db_file_exists;
+}
+
+fn set_status(projects: &mut Vec<Project>, project: String, status: String) {
+    let (found, index) = search_project(projects, &project);
+
+    if found {
+        let old_status = projects[index].status.clone();
+        println!("Updating Status: {old_status} => {status}");
+        projects[index].status = status;
+        println!("Status updated succesfully!");
+    } else {
+        println!("Project not found!");
+    }
 }
 
 fn main() {
@@ -183,8 +215,12 @@ fn main() {
             println!("Your Project was added succesfully");
             save_to_file(&projects);
         }
-        Commands::Delete { delete_name } => {
-            delete_project(&mut projects, delete_name);
+        Commands::Delete { project } => {
+            delete_project(&mut projects, project);
+            save_to_file(&projects);
+        }
+        Commands::SetStatus { project, new_status } => {
+            set_status(&mut projects, project, new_status);
             save_to_file(&projects);
         }
         Commands::List => {
